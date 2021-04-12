@@ -1,0 +1,47 @@
+{
+  "name": "nodejs-challenges",
+  "version": "1.0.0",
+  "description": "This is a repo contains the fivepoints challenges",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dagboujhatem/fivepoints-nodejs-challenges.git"
+  },
+  "keywords": [
+    "Nodejs",
+    "ExpressJS",
+    "MongoDB"
+  ],
+  "author": "DAGBOUJ Hatem",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dagboujhatem/fivepoints-nodejs-challenges/issues"
+  },
+  "homepage": "https://github.com/dagboujhatem/fivepoints-nodejs-challenges#readme",
+  "dependencies": {
+    "@aternus/csv-to-xlsx": "^1.0.17",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.15",
+    "multer": "^1.4.2",
+    "node-cron": "^2.0.3",
+    "node-xlsx": "^0.16.1",
+    "nodemailer": "^6.4.18",
+    "passport": "^0.4.1",
+    "passport-http-bearer": "^1.0.1",
+    "path": "^0.12.7",
+    "socket.io": "^3.1.1"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0"
+  }
+}
