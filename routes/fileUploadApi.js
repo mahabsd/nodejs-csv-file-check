@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'file/xlsx' || file.mimetype == 'file/csv') {
+    if (file.mimetype == 'application/vnd.ms-excel' || file.mimetype == 'text/csv' || file.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         cb(null, true);
     } else {
         cb(null, false);
@@ -24,7 +24,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 // Routes
-router.post('/upload-single', [passport.authenticate("bearer", { session: false }), upload.single('image')], async(req, res)=>{
+router.post('/upload-single', upload.single('image'), async(req, res)=>{
     res.json({message: 'Image has been uploaded successfully!'});
 });
 
