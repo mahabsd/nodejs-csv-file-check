@@ -1,9 +1,11 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const passport = require('passport');
 const router = express.Router();
 
+'use strict';
+const excelToJson = require('convert-excel-to-json');
+ 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads');
@@ -24,12 +26,13 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 // Routes
-router.post('/upload-single', upload.single('image'), async(req, res)=>{
-    res.json({message: 'Image has been uploaded successfully!'});
+router.post('/upload-single', upload.single('file'), async(req, res)=>{
+    const result = excelToJson({
+        sourceFile: req.file.path
+    });
+   console.log(result);
+    res.json({message: 'file has been uploaded successfully!'});
 });
 
-router.post('/upload-multiple', [passport.authenticate("bearer", { session: false }), upload.array("images",3)], async(req, res)=>{
-    res.json({message: 'Images has been uploaded successfully!'})
-});
 
 module.exports = router;
