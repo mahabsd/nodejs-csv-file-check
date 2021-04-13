@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+require('./database/connect');
 
 // import routes
 const fileUploadApi = require('./routes/fileUploadApi');
@@ -16,7 +17,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 // Use this line to GET ALL UPLOADED IMAGES
-app.use('/api/v1/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 
 // Routes sections
@@ -25,10 +26,9 @@ app.get('/', async(req,res) => {
     res.json({message: 'Welcome to my REST API.'});
 });
 
-app.use('/api/v1', fileUploadApi);
+app.use('/api/file', fileUploadApi);
 
 // End route section
-
 
 app.listen(process.env.port || port, () => {
     console.log(`Backend server start on port ${port}`);
