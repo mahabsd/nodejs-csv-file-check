@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+require('./database/connect');
 
 // import routes
 const fileUploadApi = require('./routes/fileUploadApi');
@@ -28,7 +29,6 @@ app.get('/', async(req,res) => {
 app.use('/api/file', fileUploadApi);
 
 // End route section
-
 
 app.listen(process.env.port || port, () => {
     console.log(`Backend server start on port ${port}`);

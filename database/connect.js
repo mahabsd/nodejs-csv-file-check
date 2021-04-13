@@ -6,8 +6,8 @@ const options = {
     useFindAndModify: false
 };
 
-const connect = mongoose.connect('mongodb://localhost:27017/database', options).then((success) => {
-        console.log("=> Successfully connection to database")
+const connect = mongoose.connect('mongodb://localhost:27017/paps', options).then((success) => {
+        console.log("Successfull connection to database")
     }).catch((error) => {
          console.log("=> Connect with error") 
     });
