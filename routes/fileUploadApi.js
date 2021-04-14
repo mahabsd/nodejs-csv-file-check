@@ -34,6 +34,10 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 // Routes
 router.post('/upload-single', upload.single('file'), async (req, res) => {
+    tab1 = []
+    tab2 = []
+    tab3 = []
+    tab4 = []
     //from excel to json
     const result = excelToJson({
         sourceFile: req.file.path
@@ -50,7 +54,7 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
     tab1.forEach(element => {
         tab2.includes(element)? tab3.push(element):tab4.push(element)
     });
-    res.json({ excelJson : result.Feuil1[0], tab3 : tab3, tab4 : tab4 });
+    res.json({ excelJson : result.Feuil1, tab3 : tab3, tab4 : tab4 });
 });
 
 module.exports = router;
