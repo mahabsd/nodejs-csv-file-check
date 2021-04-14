@@ -2,10 +2,16 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
-const model = ['LastName', 'FirstName', 'Language', 'PayId', 'PayId2', 'PayId3', 'PayId4', 'PayId5', 'PayId6', 'Mail', 'ManagerMail', 'ManagerPayId', 'IsAdmin', 'IsAccountant', 'Tags', 'LocalCountry', 'LocalCurrency', 'ReviewerMail', 'ReviewerPayId', 'DefaultProjectExternalId', 'IsActive', 'MailAlias', 'MileageRate', 'IKReference']
+const model = ['LastName', 'FirstName', 'Language', 'PayId', 'PayId2', 'PayId3']
+const Model = require('../models/model')
 let increment = 0
+let tab1 = []
+let tab2 = []
+let tab3 = []
+let tab4 = []
 'use strict';
 const excelToJson = require('convert-excel-to-json');
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -24,19 +30,27 @@ const fileFilter = (req, file, cb) => {
         cb(null, false);
     }
 }
-const upload = multer({ storage: storage, fileFilter: fileFilter });
 
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 // Routes
 router.post('/upload-single', upload.single('file'), async (req, res) => {
-    console.log(req);
+    //from excel to json
     const result = excelToJson({
         sourceFile: req.file.path
     });
-    console.log(result);
-    for (const [key, value] of Object.entries(result.Sheet1[0])) {
-        model.includes(value) ? console.log(`${key} ${value} nombre : ${increment += 1}`) : console.log(value);
+    //console.log(result);
+    let newmodel = new Model()
+
+    for (const [key1, value1] of Object.entries(result.Feuil1[0])) {
+        tab1.push(value1)
     }
-    res.json({ message: 'file has been uploaded successfully!', content : result.Sheet1[0] });
+    for (const [key1, value1] of Object.entries(newmodel._doc)) {
+        tab2.push(value1)
+    }
+    tab1.forEach(element => {
+        tab2.includes(element)? tab3.push(element):tab4.push(element)
+    });
+    res.json({ excelJson : result.Feuil1[0], tab3 : tab3, tab4 : tab4 });
 });
 
 module.exports = router;
