@@ -64,23 +64,22 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
     //     });
     // })
     await Model.find({}, function (err, models) {
-        
+        for (let i = 0; i < models.length; i++) {
+            tab2.push(models[i].colHeader)
+        }
+        console.log('tab2 est :'+tab2);
         tab1.forEach(function (element) {
-            let i= 0
-            if (models[i].colHeader == element) {
-               // console.log("le model est 3: " + models);
+            if (tab2.includes(element)) {
+                // console.log("le model est 3: " + models);
                 tab3.push(element);
-              //  console.log("tab3 est : " + tab3);
+                //  console.log("tab3 est : " + tab3);
             } else {
-              //  console.log("le model est 4: " + models);
+                //  console.log("le model est 4: " + models);
                 tab4.push(element);
-               // console.log("tab4 est : " + tab4);
+                // console.log("tab4 est : " + tab4);
             }
-            i++
         });
-        console.log("tab3 final : " + tab3);
-        console.log("tab4 final : " + tab4);
-        res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4 })
+        res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4, models: models })
     });
     //  await res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4 })
     tab1 = []
