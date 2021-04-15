@@ -48,13 +48,40 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
     for (const [key1, value1] of Object.entries(result.Feuil1[0])) {
         tab1.push(value1)
     }
-    for (const [key1, value1] of Object.entries(newmodel._doc)) {
-        tab2.push(value1)
-    }
-    tab1.forEach(element => {
-        tab2.includes(element)? tab3.push(element):tab4.push(element)
-    });
-    res.json({ excelJson : result.Feuil1, tab3 : tab3, tab4 : tab4 });
+
+   await tab1.forEach(element => {
+         Model.findOne({ colHeader: element }, async function (err, docs) {
+            console.log("element est : " + element);
+            if (err) {
+                //log error
+                console.log("erreur :" + err)
+            }
+            else {
+                if (docs != null) {
+                    console.log("le model est : " + docs);
+                    tab3.push(element);
+                    console.log("tab3 est : " + tab3);
+                } else {
+                    console.log("le model est : " + docs);
+                    tab4.push(element);
+                    console.log("tab4 est : " + tab4);
+                }
+            }
+        });
+
+    })
+    console.log("tab3 final : " +tab3);
+     console.log("tab4 final : " +tab4);
+    await res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4 })
 });
 
+
+// Model.findOne({colHeader: "LastName"}, function (err, docs) {
+//     if (err){
+//         console.log(err)
+//     }
+//     else{
+//         console.log("Result : ", docs.colHeader);
+//     }
+// });
 module.exports = router;

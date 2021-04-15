@@ -4,9 +4,11 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 require('./database/connect');
+require('./database/init-script');
 
 // import routes
 const fileUploadApi = require('./routes/fileUploadApi');
+const modelApi = require('./routes/modelApi');
 
 // Create express App
 const app = express();
@@ -27,6 +29,7 @@ app.get('/', async(req,res) => {
 });
 
 app.use('/api/file', fileUploadApi);
+app.use('/api/model', modelApi);
 
 // End route section
 
