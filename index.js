@@ -5,10 +5,12 @@ const morgan = require('morgan');
 const path = require('path');
 require('./database/connect');
 require('./database/init-script');
+require('./config/passport');
 
 // import routes
 const fileUploadApi = require('./routes/fileUploadApi');
 const modelApi = require('./routes/modelApi');
+const userApi = require('./routes/userApi');
 
 // Create express App
 const app = express();
@@ -30,6 +32,7 @@ app.get('/', async(req,res) => {
 
 app.use('/api/file', fileUploadApi);
 app.use('/api/model', modelApi);
+app.use('/api/user', userApi);
 
 // End route section
 
