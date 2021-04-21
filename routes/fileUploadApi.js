@@ -48,16 +48,11 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         for (let i = 0; i < models.length; i++) {
             tab2.push(models[i].colHeader)
         }
-        console.log('tab2 est :' + tab2);
         tab1.forEach(function (element) {
             if (tab2.includes(element)) {
-                // console.log("le model est 3: " + models);
                 tab3.push(element);
-                //  console.log("tab3 est : " + tab3);
             } else {
-                //  console.log("le model est 4: " + models);
                 tab4.push(element);
-                // console.log("tab4 est : " + tab4);
             }
         });
         res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4, models: models })
@@ -69,12 +64,12 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
     tab4 = []
 });
 
-router.get('/JSONfile', async (req, res) => {
-    console.log(req);
-    var jsonArr = req.body
+router.post('/JSONfile', async (req, res) => {
+    console.log(req.body);
+    var jsonArr = req.body[0]
     var xlsx = json2xlsx(jsonArr);
     fs.writeFileSync('uploads/mynewfile.xlsx', xlsx, 'binary');
-   await res.status(200).send('http://localhost:3000/uploads/mynewfile.xlsx');
+   await res.status(200).send({message :'http://localhost:3000/uploads/mynewfile.xlsx'});
 })
 
 module.exports = router;
