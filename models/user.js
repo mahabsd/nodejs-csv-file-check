@@ -6,7 +6,6 @@ let userSchema = new Schema(
     {
         email: { type: String },
         password: { type: String },
-        role: { type: String }
     },
     { timestamps: true })
 
