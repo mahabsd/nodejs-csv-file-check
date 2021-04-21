@@ -2,15 +2,16 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
-const model = ['LastName', 'FirstName', 'Language', 'PayId', 'PayId2', 'PayId3']
 const Model = require('../models/model')
-let increment = 0
 let tab1 = []
 let tab2 = []
 let tab3 = []
 let tab4 = []
 'use strict';
 const excelToJson = require('convert-excel-to-json');
+let json2xlsx = require('json2xls');
+let fs = require('fs');
+let clientOutput = require('../models/clientoutput')
 
 
 const storage = multer.diskStorage({
@@ -43,40 +44,15 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         tab1.push(value1)
     }
 
-    // tab1.forEach(element => {
-    //     Model.findOne({ colHeader: element }).then(async function (err, docs) {
-    //         console.log("element est : " + element);
-    //         if (err) {
-    //             //log error
-    //             console.log("erreur :" + err)
-    //         }
-    //         else {
-    //             if (docs.colHeader != undefined) {
-    //                 console.log("le model est 3: " + docs);
-    //                 tab3.push(element);
-    //                 console.log("tab3 est : " + tab3);
-    //             } else {
-    //                 console.log("le model est 4: " + docs);
-    //                 tab4.push(element);
-    //                 console.log("tab4 est : " + tab4);
-    //             }
-    //         }
-    //     });
-    // })
     await Model.find({}, function (err, models) {
         for (let i = 0; i < models.length; i++) {
             tab2.push(models[i].colHeader)
         }
-        console.log('tab2 est :'+tab2);
         tab1.forEach(function (element) {
             if (tab2.includes(element)) {
-                // console.log("le model est 3: " + models);
                 tab3.push(element);
-                //  console.log("tab3 est : " + tab3);
             } else {
-                //  console.log("le model est 4: " + models);
                 tab4.push(element);
-                // console.log("tab4 est : " + tab4);
             }
         });
         res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4, models: models })
@@ -87,5 +63,13 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
     tab3 = []
     tab4 = []
 });
+
+router.post('/JSONfile', async (req, res) => {
+    console.log(req.body);
+    var jsonArr = req.body[0]
+    var xlsx = json2xlsx(jsonArr);
+    fs.writeFileSync('uploads/mynewfile.xlsx', xlsx, 'binary');
+   await res.status(200).send({message :'http://localhost:3000/uploads/mynewfile.xlsx'});
+})
 
 module.exports = router;
