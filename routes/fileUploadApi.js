@@ -68,8 +68,9 @@ router.post('/JSONfile', async (req, res) => {
     console.log(req.body);
     var jsonArr = req.body[0]
     var xlsx = json2xlsx(jsonArr);
-    fs.writeFileSync('uploads/mynewfile.xlsx', xlsx, 'binary');
-   await res.status(200).send({message :'http://localhost:3000/uploads/mynewfile.xlsx'});
+    let r = Math.random().toString(36).substring(7);
+    fs.writeFileSync(`uploads/${r}.xlsx`, xlsx, 'binary');
+   await res.status(200).send({message :`http://localhost:3000/uploads/${r}.xlsx`});
 })
 
 module.exports = router;
