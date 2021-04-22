@@ -75,10 +75,7 @@ router.post('/JSONfile', async (req, res) => {
                     }
                 }
             }
-            console.log("hahahhahahahahaha");
-            console.log(jsonArr);
             var xlsx = json2xlsx(Object.values(jsonArr));
-    // console.log(jsonArr);
     fs.writeFileSync('uploads/mynewfile.xlsx', xlsx, 'binary');
    await res.status(200).send({message :'http://localhost:3000/uploads/mynewfile.xlsx'});
 })
