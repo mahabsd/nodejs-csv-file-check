@@ -57,7 +57,6 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         });
         res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4, models: models })
     });
-    //  await res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4 })
     tab1 = []
     tab2 = []
     tab3 = []
@@ -65,12 +64,23 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
 });
 
 router.post('/JSONfile', async (req, res) => {
-    console.log(req.body);
     var jsonArr = req.body[0]
     var xlsx = json2xlsx(jsonArr);
     let r = Math.random().toString(36).substring(7);
+
+    for (let i = 0; i < jsonArr.length; i++) {
+        for (const [key, value] of Object.entries(jsonArr[i])) {
+            if (value == "other") {
+                for (let j = 0; j < jsonArr.length; j++) {
+                    delete jsonArr[j][key]
+                }
+            }
+        }
+    }
+    var xlsx = json2xlsx(Object.values(jsonArr));
     fs.writeFileSync(`uploads/${r}.xlsx`, xlsx, 'binary');
-   await res.status(200).send({message :`http://localhost:3000/uploads/${r}.xlsx`});
+    await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
+
 })
 
 module.exports = router;
