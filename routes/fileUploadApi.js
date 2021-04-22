@@ -64,9 +64,21 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
 });
 
 router.post('/JSONfile', async (req, res) => {
-    console.log(req.body);
     var jsonArr = req.body[0]
-    var xlsx = json2xlsx(jsonArr);
+    
+            for (let i = 0; i < jsonArr.length; i++) {
+                for (const [key, value] of Object.entries(jsonArr[i])){
+                    if (value == "other") {  
+                        for (let j = 0; j < jsonArr.length; j++) {
+                            delete jsonArr[j][key]         
+                        }             
+                    }
+                }
+            }
+            console.log("hahahhahahahahaha");
+            console.log(jsonArr);
+            var xlsx = json2xlsx(Object.values(jsonArr));
+    // console.log(jsonArr);
     fs.writeFileSync('uploads/mynewfile.xlsx', xlsx, 'binary');
    await res.status(200).send({message :'http://localhost:3000/uploads/mynewfile.xlsx'});
 })
