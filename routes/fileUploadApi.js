@@ -43,26 +43,6 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         tab1.push(value1)
     }
 
-    // tab1.forEach(element => {
-    //     Model.findOne({ colHeader: element }).then(async function (err, docs) {
-    //         console.log("element est : " + element);
-    //         if (err) {
-    //             //log error
-    //             console.log("erreur :" + err)
-    //         }
-    //         else {
-    //             if (docs.colHeader != undefined) {
-    //                 console.log("le model est 3: " + docs);
-    //                 tab3.push(element);
-    //                 console.log("tab3 est : " + tab3);
-    //             } else {
-    //                 console.log("le model est 4: " + docs);
-    //                 tab4.push(element);
-    //                 console.log("tab4 est : " + tab4);
-    //             }
-    //         }
-    //     });
-    // })
     await Model.find({}, function (err, models) {
         for (let i = 0; i < models.length; i++) {
             tab2.push(models[i].colHeader)
@@ -70,18 +50,13 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         console.log('tab2 est :'+tab2);
         tab1.forEach(function (element) {
             if (tab2.includes(element)) {
-                // console.log("le model est 3: " + models);
                 tab3.push(element);
-                //  console.log("tab3 est : " + tab3);
             } else {
-                //  console.log("le model est 4: " + models);
                 tab4.push(element);
-                // console.log("tab4 est : " + tab4);
             }
         });
         res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4, models: models })
     });
-    //  await res.status(200).json({ excelJson: result.Feuil1, tab3: tab3, tab4: tab4 })
     tab1 = []
     tab2 = []
     tab3 = []
