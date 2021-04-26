@@ -12,7 +12,6 @@ const excelToJson = require('convert-excel-to-json');
 let json2xlsx = require('json2xls');
 let fs = require('fs');
 let clientOutput = require('../models/clientoutput')
-let csvToJson = require('convert-csv-to-json');
 const convertCsvToXlsx = require('@aternus/csv-to-xlsx');
 
 const storage = multer.diskStorage({
@@ -41,7 +40,8 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                 sourceFile: destination
             });
             let sheet1 = Object.entries(Object.entries(result)[0])[1]
-            console.log(Object.entries(sheet1[1][0]));
+            console.log(result);
+            //console.log(Object.entries(sheet1[1][0]));
             for (const [key1, value1] of Object.entries(sheet1[1][0])) {
                 tab1.push(value1)
             }
@@ -98,7 +98,7 @@ router.post('/JSONfile', async (req, res) => {
     var jsonArr = req.body[0]
     var xlsx = json2xlsx(jsonArr);
     let r = Math.random().toString(36).substring(7);
-
+    //delete unwanted header
     for (let i = 0; i < jsonArr.length; i++) {
         for (const [key, value] of Object.entries(jsonArr[i])) {
             if (value == "other") {
@@ -108,8 +108,27 @@ router.post('/JSONfile', async (req, res) => {
             }
         }
     }
+    //add new users in db
+    for (let i = 1; i < jsonArr.length; i++) {
+        let User = new clientOutput(jsonArr[i])
+        clientOutput.findOne({ A: User.A, B: User.B }).then((users, err) => {
+            clientOutput.countDocuments(function (err, count) {
+                if (users == null || (count == 0)) {
+                    User.save()
+                }
+            });
+        })
+    }
 
-    // ------------------- to change json KEYS : ---------------
+    var xlsx = json2xlsx(Object.values(jsonArr));
+    fs.writeFileSync(`uploads/${r}.xlsx`, xlsx, 'binary');
+    await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
+
+})
+
+module.exports = router;
+
+   // ------------------- to change json KEYS : ---------------
     // let tabfirstrow = []
     // for (const [key, value] of Object.entries(jsonArr[0])) {
     //    tabfirstrow.push(value)
@@ -155,24 +174,5 @@ router.post('/JSONfile', async (req, res) => {
     //         Object.keys(user).forEach(key1 => {
     //             user[key1] = jsonArr[i][key]
     //         })
-    //     })
+    //})
     //     users.push(user)
-    for (let i = 1; i < jsonArr.length; i++) {
-        let User = new clientOutput(jsonArr[i])
-        clientOutput.findOne({A: User.A, B: User.B }).then((users, err) => {
-            console.log(users);
-            clientOutput.countDocuments(function (err, count) {
-                if (users == null || (count == 0)) {
-                 User.save()
-                }
-            });
-        })
-    }
-
-    var xlsx = json2xlsx(Object.values(jsonArr));
-    fs.writeFileSync(`uploads/${r}.xlsx`, xlsx, 'binary');
-    await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
-
-})
-
-module.exports = router;
