@@ -93,7 +93,6 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
     tab3 = []
     tab4 = []
 });
-
 router.post('/JSONfile', async (req, res) => {
     var jsonArr = req.body[0]
     var xlsx = json2xlsx(jsonArr);
@@ -109,9 +108,45 @@ router.post('/JSONfile', async (req, res) => {
         }
     }
     //add new users in db
+
     for (let i = 1; i < jsonArr.length; i++) {
-        let User = new clientOutput(jsonArr[i])
-        clientOutput.findOne({ A: User.A, B: User.B }).then((users, err) => {
+        let user = {
+            LastName: "",
+            FirstName: "",
+            PayId: "",
+            PayId2: "",
+            PayId3: "",
+            PayId4: "",
+            PayId5: "",
+            PayId6: "",
+            Mail: "",
+            ManagerMail: "",
+            ManagerPayId: "",
+            IsAdmin: "",
+            IsAccountant: "",
+            Tags: "",
+            LocalCountry: "",
+            LocalCurrency: "",
+            ReviewerMail: "",
+            ReviewerPayId: "",
+            DefaultProjectExternalId: "",
+            IsActive: "",
+            MailAlias: "",
+            MileageRate: "",
+            IKReference: "",
+        }
+        Object.keys(jsonArr[i]).forEach(key => {
+            Object.keys(user).forEach(key1 => {
+                if (key1 == jsonArr[0][key]) {
+                    user[key1] = jsonArr[i][key]
+                }
+            })
+        })
+        let User = new clientOutput(user)
+        clientOutput.findOne({
+            LastName: User.LastName, FirstName: User.FirstName,
+            Mail: User.Mail, MailAlias: User.MailAlias
+        }).then((users, err) => {
             clientOutput.countDocuments(function (err, count) {
                 if (users == null || (count == 0)) {
                     User.save()
@@ -119,60 +154,14 @@ router.post('/JSONfile', async (req, res) => {
             });
         })
     }
-
     var xlsx = json2xlsx(Object.values(jsonArr));
     fs.writeFileSync(`uploads/${r}.xlsx`, xlsx, 'binary');
     await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
 
 })
-
+router.get("getAllusers", (req, res) => {
+    clientOutput.find().exec().then(function (users) {
+        res.status(200).json(users);
+    }).catch(err => res.status(400).json('Error: ' + err));
+})
 module.exports = router;
-
-   // ------------------- to change json KEYS : ---------------
-    // let tabfirstrow = []
-    // for (const [key, value] of Object.entries(jsonArr[0])) {
-    //    tabfirstrow.push(value)
-    // }
-    // for (let i = 0; i < jsonArr.length; i++) {
-    //     for (const [key, value] of Object.entries(jsonArr[i])) {
-    //         tabfirstrow.forEach(element => {
-    //             if (key !== element) {
-    //                 Object.assign(jsonArr[i], { [element]: jsonArr[i][key] })[key];
-    //             }
-    //         });
-    //     }
-    // }
-    // let user = {
-    //     LastName: "string",
-    //     FirstName: "string",
-    //     PayId: "string",
-    //     PayId2: "string",
-    //     PayId3: "string",
-    //     PayId4: "string",
-    //     PayId5: "string",
-    //     PayId6: "string",
-    //     Mail: "string",
-    //     ManagerMail: "string",
-    //     ManagerPayId: "string",
-    //     IsAdmin: "string",
-    //     IsAccountant: "string",
-    //     Tags: "string",
-    //     LocalCountry: "string",
-    //     LocalCurrency: "string",
-    //     ReviewerMail: "string",
-    //     ReviewerPayId: "string",
-    //     DefaultProjectExternalId: "string",
-    //     IsActive: "string",
-    //     MailAlias: "string",
-    //     MileageRate: "string",
-    //     IKReference: "string",
-    // }
-    // let users = []
-
-    // for (let i = 1; i < jsonArr.length; i++) {
-    //     Object.keys(jsonArr[i]).forEach(key => {
-    //         Object.keys(user).forEach(key1 => {
-    //             user[key1] = jsonArr[i][key]
-    //         })
-    //})
-    //     users.push(user)
