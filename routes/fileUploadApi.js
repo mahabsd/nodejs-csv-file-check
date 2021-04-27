@@ -67,9 +67,54 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         const result = excelToJson({
             sourceFile: req.file.path
         });
+
+        // /////////////////////////////////////////////////
+        // to check if there are more cases than the header
+        // ////////////////////////////////////////////////
+        var fileClean = true
+        var caseProblem = []
+        // for (let i = 1; i < result.Feuil1.length; i++) {
+        //     // console.log("result.Feuil1[i-1].length :");
+        //     // console.log(Object.keys(result.Feuil1[0]).length);
+        //     // console.log("result.Feuil1[i].length");
+        //     // console.log(result.Feuil1[1]);
+        //     if (Object.keys(result.Feuil1[0]).length < Object.keys(result.Feuil1[i]).length) {
+        //         fileClean = false
+        //         caseProblem.push({
+        //             errLigne1: 0,
+        //             errLigne1Lenght: Object.keys(result.Feuil1[0]).length, 
+        //             errLigne2: i,
+        //             errLigne2Lenght: Object.keys(result.Feuil1[i]).length
+        //         })
+        //     }
+        // }
+
+        // console.log("my file is clean :");
+        // console.log(fileClean);
+        // if (caseProblem.length > 0) {
+        //     console.log(caseProblem);
+        // }
+       
+        // //////////////////////////////
+        // to check empty cases in the header
+        // /////////////////////////////
+        // console.log("mon result : ");
+        // console.log("---------------");
+        // var x = 'F'
+        // console.log(result.Feuil1[0]);
+        // if (!result.Feuil1[0][x]) {
+        //     console.log('houga houga bla bla bla');
+        //     result.Feuil1[0][x] = 'EMPTY !!'
+        //     console.log(result.Feuil1[0]);
+        // }
+        // console.log("---------------");
+
+
+
+
         //   console.log(Object.keys(result)[0]);
         let sheet1 = Object.entries(Object.entries(result)[0])[1]
-        console.log(Object.entries(sheet1[1][0]));
+        // console.log(Object.entries(sheet1[1][0]));
         for (const [key1, value1] of Object.entries(sheet1[1][0])) {
             tab1.push(value1)
         }
@@ -84,7 +129,8 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                     tab4.push(element);
                 }
             });
-            res.status(200).json({ excelJson: sheet1[1], tab3: tab3, tab4: tab4, models: models })
+            
+            res.status(200).json({ excelJson: sheet1[1], tab3: tab3, tab4: tab4, models: models, fileClean: fileClean, caseProblem: caseProblem})
         });
     }
 
@@ -128,51 +174,3 @@ router.post('/JSONfile', async (req, res) => {
 
 module.exports = router;
 
-   // ------------------- to change json KEYS : ---------------
-    // let tabfirstrow = []
-    // for (const [key, value] of Object.entries(jsonArr[0])) {
-    //    tabfirstrow.push(value)
-    // }
-    // for (let i = 0; i < jsonArr.length; i++) {
-    //     for (const [key, value] of Object.entries(jsonArr[i])) {
-    //         tabfirstrow.forEach(element => {
-    //             if (key !== element) {
-    //                 Object.assign(jsonArr[i], { [element]: jsonArr[i][key] })[key];
-    //             }
-    //         });
-    //     }
-    // }
-    // let user = {
-    //     LastName: "string",
-    //     FirstName: "string",
-    //     PayId: "string",
-    //     PayId2: "string",
-    //     PayId3: "string",
-    //     PayId4: "string",
-    //     PayId5: "string",
-    //     PayId6: "string",
-    //     Mail: "string",
-    //     ManagerMail: "string",
-    //     ManagerPayId: "string",
-    //     IsAdmin: "string",
-    //     IsAccountant: "string",
-    //     Tags: "string",
-    //     LocalCountry: "string",
-    //     LocalCurrency: "string",
-    //     ReviewerMail: "string",
-    //     ReviewerPayId: "string",
-    //     DefaultProjectExternalId: "string",
-    //     IsActive: "string",
-    //     MailAlias: "string",
-    //     MileageRate: "string",
-    //     IKReference: "string",
-    // }
-    // let users = []
-
-    // for (let i = 1; i < jsonArr.length; i++) {
-    //     Object.keys(jsonArr[i]).forEach(key => {
-    //         Object.keys(user).forEach(key1 => {
-    //             user[key1] = jsonArr[i][key]
-    //         })
-    //})
-    //     users.push(user)
