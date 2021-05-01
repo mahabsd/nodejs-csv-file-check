@@ -32,7 +32,11 @@
     "ejs": "^3.1.6",
     "excel4node": "^1.7.2",
     "express": "^4.17.1",
+    "free-translate": "^0.4.0",
+    "free-translator": "^0.2.2",
     "fs": "0.0.1-security",
+    "google-translate-api": "^2.3.0",
+    "google-translate-free": "^2.4.5",
     "http": "0.0.1-security",
     "json-as-xlsx": "^1.2.1",
     "json2xls": "^0.1.2",
@@ -46,7 +50,9 @@
     "passport": "^0.4.1",
     "passport-http-bearer": "^1.0.1",
     "path": "^0.12.7",
-    "socket.io": "^3.1.1"
+    "socket.io": "^3.1.1",
+    "translate": "^1.2.3",
+    "translatte": "^3.0.0"
   },
   "devDependencies": {
     "morgan": "^1.10.0"
