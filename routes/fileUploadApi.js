@@ -100,14 +100,20 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         // /////////////////////////////
         // console.log("mon result : ");
         // console.log("---------------");
-        // var x = 'F'
-        // console.log(result.Feuil1[0]);
-        // if (!result.Feuil1[0][x]) {
-        //     console.log('houga houga bla bla bla');
-        //     result.Feuil1[0][x] = 'EMPTY !!'
-        //     console.log(result.Feuil1[0]);
-        // }
-        // console.log("---------------");
+        var x = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        // console.log(result.Sheet1[0]);
+        for (let j = 0; j < x.length; j++) {           
+            for (let i = 1; i < result.Sheet1.length; i++) {               
+                if (!result.Sheet1[0][x[j]] && result.Sheet1[i][x[j]]) {
+                    result.Sheet1[0][x[j]] = 'CASE ' + (j+1)
+                    i = result.Sheet1.length
+                    console.log(result.Sheet1[0]);
+                }  
+            }        
+        }
+
+
+        console.log("---------------");
 
 
 
@@ -205,8 +211,10 @@ router.post('/JSONfile', async (req, res) => {
     await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
 
 })
-router.get("getAllusers", (req, res) => {
+router.get("/getAllUsers", (req, res) => {
     clientOutput.find().exec().then(function (users) {
+        console.log("my useres");
+        console.log(users);
         res.status(200).json(users);
     }).catch(err => res.status(400).json('Error: ' + err));
 })
