@@ -2,7 +2,9 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
-const Model = require('../models/model')
+const Model = require('../models/model');
+const translatte = require('translatte');
+
 let tab1 = []
 let tab2 = []
 let tab3 = []
@@ -56,7 +58,19 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                         tab4.push(element);
                     }
                 });
-                res.status(200).json({ excelJson: sheet1[1], tab3: tab3, tab4: tab4, models: models })
+                for (let index = 0; index < tab4.length; index++) {
+                    tab5 = []
+                    translatte(tab4[index], { from: 'fr', to: 'en' }).then(res => {
+                        tab5.push(res.text)
+                    }).catch(err => {
+                        console.error(err);
+                    });
+                }
+                tab04 = tab4
+                tab03 = tab3
+                setTimeout(function(){
+                    res.status(200).json({ excelJson: sheet1[1], tab3: tab03, tab4: tab04, models: models, tab5: tab5 })
+                    }, 5000);
             });
 
         } catch (e) {
@@ -129,8 +143,19 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                     tab4.push(element);
                 }
             });
-            
-            res.status(200).json({ excelJson: sheet1[1], tab3: tab3, tab4: tab4, models: models, fileClean: fileClean, caseProblem: caseProblem})
+            for (let index = 0; index < tab4.length; index++) {
+                tab5 = []
+                translatte(tab4[index], { from: 'fr', to: 'en' }).then(res => {
+                    tab5.push(res.text)
+                }).catch(err => {
+                    console.error(err);
+                });
+            }
+            tab04 = tab4
+            tab03 = tab3
+            setTimeout(function(){
+                res.status(200).json({ excelJson: sheet1[1], tab3: tab03, tab4: tab04, models: models, tab5: tab5 })
+                }, 5000);        
         });
     }
 
@@ -205,7 +230,7 @@ router.post('/JSONfile', async (req, res) => {
     await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
 
 })
-router.get("getAllusers", (req, res) => {
+router.get("/getAllUsers", (req, res) => {
     clientOutput.find().exec().then(function (users) {
         res.status(200).json(users);
     }).catch(err => res.status(400).json('Error: ' + err));
