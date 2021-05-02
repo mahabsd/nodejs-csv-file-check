@@ -9,6 +9,7 @@ let tab1 = []
 let tab2 = []
 let tab3 = []
 let tab4 = []
+let tab5 = []
 'use strict';
 const excelToJson = require('convert-excel-to-json');
 let json2xlsx = require('json2xls');
@@ -42,8 +43,7 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                 sourceFile: destination
             });
             let sheet1 = Object.entries(Object.entries(result)[0])[1]
-            console.log(result);
-            //console.log(Object.entries(sheet1[1][0]));
+
             for (const [key1, value1] of Object.entries(sheet1[1][0])) {
                 tab1.push(value1)
             }
@@ -68,9 +68,9 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                 }
                 tab04 = tab4
                 tab03 = tab3
-                setTimeout(function(){
+                setTimeout(function () {
                     res.status(200).json({ excelJson: sheet1[1], tab3: tab03, tab4: tab04, models: models, tab5: tab5 })
-                    }, 5000);
+                }, 5000);
             });
 
         } catch (e) {
@@ -108,33 +108,23 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         // if (caseProblem.length > 0) {
         //     console.log(caseProblem);
         // }
-       
+
         // //////////////////////////////
         // to check empty cases in the header
         // /////////////////////////////
         // console.log("mon result : ");
         // console.log("---------------");
         var x = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        // console.log(result.Sheet1[0]);
-        for (let j = 0; j < x.length; j++) {           
-            for (let i = 1; i < result.Sheet1.length; i++) {               
-                if (!result.Sheet1[0][x[j]] && result.Sheet1[i][x[j]]) {
-                    result.Sheet1[0][x[j]] = 'CASE ' + (j+1)
-                    i = result.Sheet1.length
-                    console.log(result.Sheet1[0]);
-                }  
-            }        
+        let sheet1 = Object.entries(Object.entries(result)[0])[1]
+        for (let j = 0; j < x.length; j++) {
+            for (let i = 1; i < sheet1.length; i++) {
+                if (!sheet1[1][0][x[j]] && sheet1[1][i][x[j]]) {
+                    sheet1[1][0][x[j]] = 'CASE ' + (j + 1)
+                    i = sheet1.length
+                }
+            }
         }
 
-
-        console.log("---------------");
-
-
-
-
-        //   console.log(Object.keys(result)[0]);
-        let sheet1 = Object.entries(Object.entries(result)[0])[1]
-        // console.log(Object.entries(sheet1[1][0]));
         for (const [key1, value1] of Object.entries(sheet1[1][0])) {
             tab1.push(value1)
         }
@@ -159,9 +149,9 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
             }
             tab04 = tab4
             tab03 = tab3
-            setTimeout(function(){
+            setTimeout(function () {
                 res.status(200).json({ excelJson: sheet1[1], tab3: tab03, tab4: tab04, models: models, tab5: tab5 })
-                }, 5000);        
+            }, 5000);
         });
     }
 
@@ -238,8 +228,6 @@ router.post('/JSONfile', async (req, res) => {
 })
 router.get("/getAllUsers", (req, res) => {
     clientOutput.find().exec().then(function (users) {
-        console.log("my useres");
-        console.log(users);
         res.status(200).json(users);
     }).catch(err => res.status(400).json('Error: ' + err));
 })
