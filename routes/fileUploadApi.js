@@ -44,6 +44,16 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
             });
             let sheet1 = Object.entries(Object.entries(result)[0])[1]
 
+            var x = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            for (let j = 0; j < x.length; j++) {
+                for (let i = 1; i < sheet1.length; i++) {
+                    if (!sheet1[1][0][x[j]] && sheet1[1][i][x[j]]) {
+                        sheet1[1][0][x[j]] = 'CASE ' + (j + 1)
+                        i = sheet1.length
+                    }
+                }
+            }
+
             for (const [key1, value1] of Object.entries(sheet1[1][0])) {
                 tab1.push(value1)
             }
