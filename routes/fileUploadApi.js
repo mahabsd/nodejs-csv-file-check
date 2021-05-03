@@ -4,12 +4,12 @@ const path = require('path');
 const router = express.Router();
 const Model = require('../models/model');
 const translatte = require('translatte');
-
-let tab1 = []
-let tab2 = []
-let tab3 = []
-let tab4 = []
-let tab5 = []
+const parse = require('csv-parse/lib/sync')
+var tab1 = []
+var tab2 = []
+var tab3 = []
+var tab4 = []
+var tab5 = []
 'use strict';
 const excelToJson = require('convert-excel-to-json');
 let json2xlsx = require('json2xls');
@@ -34,9 +34,17 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
 
     lastFour = req.file.path.substr(req.file.path.length - 4);
     if (lastFour == ".csv") {
-
-        let r = Math.random().toString(36).substring(7);
-        let destination = path.join('uploads', `${r}.xlsx`);
+        
+        //  const absolutePath = path.join("../uploads", req.file.path);
+        // const jsonString = fs.readFileSync(req.file.path, "utf-8");
+        // const records = parse(jsonString, {
+        //   delimiter: [";",","],
+        //   trim: true
+        // })
+        //   //console.log(records);
+        //   recordsString = records.toString()
+          let r = Math.random().toString(36).substring(7);
+          let destination = path.join('uploads', `${r}.xlsx`);
         try {
             convertCsvToXlsx(req.file.path, destination);
             const result = excelToJson({
@@ -57,25 +65,45 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
             for (const [key1, value1] of Object.entries(sheet1[1][0])) {
                 tab1.push(value1)
             }
-            await Model.find({}, function (err, models) {
+            await Model.find({}, async (err, models)=> {
                 for (let i = 0; i < models.length; i++) {
                     tab2.push(models[i].colHeader)
                 }
-                tab1.forEach(function (element) {
+                tab1.forEach(async (element)=> {
                     if (tab2.includes(element)) {
                         tab3.push(element);
                     } else {
                         tab4.push(element);
+                        try{
+
+                            const res = await translatte(element, { from: 'fr', to: 'en' });
+                            console.log('heyyyyyy');
+                            tab5.push({word:element, tanslated : res.text})
+                            console.log(tab5);
+                            console.log(tab4);
+    
+                        }catch(error)
+                        {
+                            console.error(err);
+                        }
                     }
                 });
-                for (let index = 0; index < tab4.length; index++) {
-                    tab5 = []
-                    translatte(tab4[index], { from: 'fr', to: 'en' }).then(res => {
-                        tab5.push(res.text)
-                    }).catch(err => {
-                        console.error(err);
-                    });
-                }
+                // for (let index = 0; index < tab4.length; index++) {
+                   
+                //     tab5 = []
+                //     try{
+
+                //         const res = await translatte(tab4[index], { from: 'fr', to: 'en' });
+                //         console.log('heyyyyyy');
+                //         tab5.push({word:tab4[index], tanslated : res.text})
+                //         console.log(tab5);
+                //         console.log(tab4);
+
+                //     }catch(error)
+                //     {
+                //         console.error(err);
+                //     }
+                // }
                 tab04 = tab4
                 tab03 = tab3
                 setTimeout(function () {
@@ -152,7 +180,9 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
             for (let index = 0; index < tab4.length; index++) {
                 tab5 = []
                 translatte(tab4[index], { from: 'fr', to: 'en' }).then(res => {
-                    tab5.push(res.text)
+console.log('heyyyyyy');
+                    tab5.push({word:tab4[index], tanslated : res.text})
+                    console.log(tab5);
                 }).catch(err => {
                     console.error(err);
                 });
