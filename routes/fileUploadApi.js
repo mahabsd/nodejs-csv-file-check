@@ -4,12 +4,10 @@ const path = require('path');
 const router = express.Router();
 const Model = require('../models/model');
 const translatte = require('translatte');
-const parse = require('csv-parse/lib/sync')
-var tab1 = []
-var tab2 = []
-var tab3 = []
-var tab4 = []
-var tab5 = []
+const controllersApi = require("./controllersApi")
+var excelHeader = []
+var modelArray = []
+var translatedHeader = []
 'use strict';
 const excelToJson = require('convert-excel-to-json');
 let json2xlsx = require('json2xls');
@@ -26,78 +24,42 @@ const storage = multer.diskStorage({
         cb(null, newFileName);
     }
 });
-
-
 const upload = multer({ storage: storage });
+
 // Routes
 router.post('/upload-single', upload.single('file'), async (req, res) => {
 
     lastFour = req.file.path.substr(req.file.path.length - 4);
     if (lastFour == ".csv") {
-        
-        //  const absolutePath = path.join("../uploads", req.file.path);
-        // const jsonString = fs.readFileSync(req.file.path, "utf-8");
-        // const records = parse(jsonString, {
-        //   delimiter: [";",","],
-        //   trim: true
-        // })
-        //   //console.log(records);
-        //   recordsString = records.toString()
-          let r = Math.random().toString(36).substring(7);
-          let destination = path.join('uploads', `${r}.xlsx`);
+        //generate random file name
+        let randomName = controllersApi.randomFileName()
+        let destination = path.join('uploads', `${randomName}.xlsx`);
+
         try {
             convertCsvToXlsx(req.file.path, destination);
             const result = excelToJson({
                 sourceFile: destination
             });
             let sheet1 = Object.entries(Object.entries(result)[0])[1]
-
+            //empty case check
+            sheet1 = controllersApi.emptyCaseCheck(sheet1)
             for (const [key1, value1] of Object.entries(sheet1[1][0])) {
-                tab1.push(value1)
+                excelHeader.push(value1)
             }
-            await Model.find({}, async (err, models)=> {
-                for (let i = 0; i < models.length; i++) {
-                    tab2.push(models[i].colHeader)
+            await Model.find({}, async (err, modelArrays) => {
+                for (let i = 0; i < modelArrays.length; i++) {
+                    modelArray.push(modelArrays[i].colHeader)
                 }
-                tab1.forEach(async (element)=> {
-                    if (tab2.includes(element)) {
-                        tab3.push(element);
-                    } else {
-                        tab4.push(element);
-                        try{
-
-                            const res = await translatte(element, { from: 'fr', to: 'en' });
-                            console.log('heyyyyyy');
-                            tab5.push({word:element, tanslated : res.text})
-                            console.log(tab5);
-                            console.log(tab4);
-    
-                        }catch(error)
-                        {
-                            console.error(err);
-                        }
-                    }
-                });
-                // for (let index = 0; index < tab4.length; index++) {
-                   
-                //     tab5 = []
-                //     try{
-
-                //         const res = await translatte(tab4[index], { from: 'fr', to: 'en' });
-                //         console.log('heyyyyyy');
-                //         tab5.push({word:tab4[index], tanslated : res.text})
-                //         console.log(tab5);
-                //         console.log(tab4);
-
-                //     }catch(error)
-                //     {
-                //         console.error(err);
-                //     }
-                // }
-                tab04 = tab4
-                tab03 = tab3
+                //model-excel file comparison and translation
+                let mapTransResult = controllersApi.modelExcelCompare(excelHeader, modelArray)
+                console.log(Object.entries(mapTransResult)[1][1]);
+                Object.entries(mapTransResult)[1][1].forEach(async(element) => {
+                    const res = await translatte(element, { from: 'fr', to: 'en' });
+                    //translatedHeader.push({word:element, tanslated : res.text})
+                    translatedHeader.push(res.text)
+                })
                 setTimeout(function () {
-                    res.status(200).json({ excelJson: sheet1[1], tab3: tab03, tab4: tab04, models: models, tab5: tab5 })
+                    res.status(200).json({ excelJson: sheet1[1], found: Object.entries(mapTransResult)[0][1], notFound: Object.entries(mapTransResult)[1][1], models: modelArray, translatedHeader: translatedHeader })
                 }, 5000);
             });
 
@@ -109,104 +71,37 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
         const result = excelToJson({
             sourceFile: req.file.path
         });
-
-        // /////////////////////////////////////////////////
-        // to check if there are more cases than the header
-        // ////////////////////////////////////////////////
-        var fileClean = true
-        var caseProblem = []
-        // for (let i = 1; i < result.Feuil1.length; i++) {
-        //     // console.log("result.Feuil1[i-1].length :");
-        //     // console.log(Object.keys(result.Feuil1[0]).length);
-        //     // console.log("result.Feuil1[i].length");
-        //     // console.log(result.Feuil1[1]);
-        //     if (Object.keys(result.Feuil1[0]).length < Object.keys(result.Feuil1[i]).length) {
-        //         fileClean = false
-        //         caseProblem.push({
-        //             errLigne1: 0,
-        //             errLigne1Lenght: Object.keys(result.Feuil1[0]).length, 
-        //             errLigne2: i,
-        //             errLigne2Lenght: Object.keys(result.Feuil1[i]).length
-        //         })
-        //     }
-        // }
-
-        // console.log("my file is clean :");
-        // console.log(fileClean);
-        // if (caseProblem.length > 0) {
-        //     console.log(caseProblem);
-        // }
-
-        // //////////////////////////////
-        // to check empty cases in the header
-        // /////////////////////////////
-        // console.log("mon result : ");
-        // console.log("---------------");
-        var x = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         let sheet1 = Object.entries(Object.entries(result)[0])[1]
-        for (let j = 0; j < x.length; j++) {
-            for (let i = 1; i < sheet1.length; i++) {
-                if (!sheet1[1][0][x[j]] && sheet1[1][i][x[j]]) {
-                    sheet1[1][0][x[j]] = 'CASE ' + (j + 1)
-                    i = sheet1.length
-                }
-            }
-        }
+        sheet1 = controllersApi.emptyCaseCheck(sheet1)
 
         for (const [key1, value1] of Object.entries(sheet1[1][0])) {
-            tab1.push(value1)
+            excelHeader.push(value1)
         }
-        await Model.find({}, function (err, models) {
-            for (let i = 0; i < models.length; i++) {
-                tab2.push(models[i].colHeader)
+        await Model.find({}, function (err, modelArrays) {
+            for (let i = 0; i < modelArrays.length; i++) {
+                modelArray.push(modelArrays[i].colHeader)
             }
-            tab1.forEach(function (element) {
-                if (tab2.includes(element)) {
-                    tab3.push(element);
-                } else {
-                    tab4.push(element);
-                }
-            });
-            for (let index = 0; index < tab4.length; index++) {
-                tab5 = []
-                translatte(tab4[index], { from: 'fr', to: 'en' }).then(res => {
-console.log('heyyyyyy');
-                    tab5.push({word:tab4[index], tanslated : res.text})
-                    console.log(tab5);
-                }).catch(err => {
-                    console.error(err);
-                });
-            }
-            tab04 = tab4
-            tab03 = tab3
+            //model-excel file comparison and translation
+            let mapTransResult = controllersApi.modelExcelCompare(excelHeader, modelArray)
+            Object.entries(mapTransResult)[1][1].forEach(async(element) => {
+                const res = await translatte(element, { from: 'fr', to: 'en' });
+                //translatedHeader.push({word:element, tanslated : res.text})
+                translatedHeader.push(res.text)
+            })
             setTimeout(function () {
-                res.status(200).json({ excelJson: sheet1[1], tab3: tab03, tab4: tab04, models: models, tab5: tab5 })
+                res.status(200).json({ excelJson: sheet1[1], found: Object.entries(mapTransResult)[0][1], notFound: Object.entries(mapTransResult)[1][1], modelArray: modelArray, translatedHeader: translatedHeader })
             }, 5000);
         });
     }
-
-    tab1 = []
-    tab2 = []
-    tab3 = []
-    tab4 = []
 });
+
 router.post('/JSONfile', async (req, res) => {
     var jsonArr = req.body[0]
-    var xlsx = json2xlsx(jsonArr);
-    let r = Math.random().toString(36).substring(7);
-    //delete unwanted header
-    for (let i = 0; i < jsonArr.length; i++) {
-        for (const [key, value] of Object.entries(jsonArr[i])) {
-            if (value == "other") {
-                for (let j = 0; j < jsonArr.length; j++) {
-                    delete jsonArr[j][key]
-                }
-            }
-        }
-    }
+    let randomxlsxName =  controllersApi.randomFileName()
+    //delete unwanted header in excel sheet
+   let jsonArray = controllersApi.deleteUnwantedHeader(jsonArr)
     //add new users in db
-
-    for (let i = 1; i < jsonArr.length; i++) {
+    for (let i = 1; i < jsonArray.length; i++) {
         let user = {
             LastName: "",
             FirstName: "",
@@ -232,10 +127,10 @@ router.post('/JSONfile', async (req, res) => {
             MileageRate: "",
             IKReference: "",
         }
-        Object.keys(jsonArr[i]).forEach(key => {
+        Object.keys(jsonArray[i]).forEach(key => {
             Object.keys(user).forEach(key1 => {
-                if (key1 == jsonArr[0][key]) {
-                    user[key1] = jsonArr[i][key]
+                if (key1 == jsonArray[0][key]) {
+                    user[key1] = jsonArray[i][key]
                 }
             })
         })
@@ -251,9 +146,9 @@ router.post('/JSONfile', async (req, res) => {
             });
         })
     }
-    var xlsx = json2xlsx(Object.values(jsonArr));
-    fs.writeFileSync(`uploads/${r}.xlsx`, xlsx, 'binary');
-    await res.status(200).send({ message: `http://localhost:3000/uploads/${r}.xlsx` });
+    var xlsx = json2xlsx(Object.values(jsonArray));
+    fs.writeFileSync(`uploads/${randomxlsxName}.xlsx`, xlsx, 'binary');
+    await res.status(200).send({ message: `http://localhost:3000/uploads/${randomxlsxName}.xlsx` });
 
 })
 router.get("/getAllUsers", (req, res) => {
@@ -261,4 +156,5 @@ router.get("/getAllUsers", (req, res) => {
         res.status(200).json(users);
     }).catch(err => res.status(400).json('Error: ' + err));
 })
+
 module.exports = router;
