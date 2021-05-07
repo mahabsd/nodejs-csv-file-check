@@ -28,7 +28,10 @@ const upload = multer({ storage: storage });
 
 // Routes
 router.post('/upload-single', upload.single('file'), async (req, res) => {
-
+    excelHeader = []
+    modelArray = []
+    translatedHeader = []
+    modelArray = []
     lastFour = req.file.path.substr(req.file.path.length - 4);
     if (lastFour == ".csv") {
         //generate random file name
@@ -59,7 +62,7 @@ router.post('/upload-single', upload.single('file'), async (req, res) => {
                     translatedHeader.push(res.text)
                 })
                 setTimeout(function () {
-                    res.status(200).json({ excelJson: sheet1[1], found: Object.entries(mapTransResult)[0][1], notFound: Object.entries(mapTransResult)[1][1], models: modelArray, translatedHeader: translatedHeader })
+                    res.status(200).json({ excelJson: sheet1[1], found: Object.entries(mapTransResult)[0][1], notFound: Object.entries(mapTransResult)[1][1], models: modelArrays, translatedHeader: translatedHeader })
                 }, 5000);
             });
 

@@ -48,4 +48,5 @@ exports.deleteUnwantedHeader = (jsonArr) => {
             }
         }
     }
+    return jsonArr
 }
