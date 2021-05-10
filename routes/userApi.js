@@ -42,7 +42,7 @@ router.get('/getAllusers', passport.authenticate('bearer', { session: false }), 
 
 // sign in with passport
 router.post('/login', (req, res) => {
-    User.findOne({ "email": req.body.email }).populate('work.roles').then(user => {
+    User.findOne({ "email": req.body.email }).then(user => {
         if (!user) {
             return res.status(404).json({
                 message: "Email is not found.",
