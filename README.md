@@ -1,6 +1,6 @@
-# FivePoints NodeJS Challenges
+# Expensya project
 
-This is a git repository contains a project csv file mapping for Expensya
+This is a git repository contains a project named csv file mapping for Expensya
 
 ## Content :
 
